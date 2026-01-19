@@ -1,0 +1,55 @@
+<h1>Рецепт</h1>
+
+<form method="post">
+  {% csrf_token %}
+
+  <input
+    type="text"
+    name="title"
+    placeholder="Название"
+    value="{{ recipe.title|default:'' }}"
+    required
+  /><br />
+
+  <textarea
+    name="description"
+    placeholder="Описание"
+    required
+  >{{ recipe.description|default:'' }}</textarea><br />
+
+  <input
+    type="number"
+    name="cooking_time"
+    placeholder="Время приготовления"
+    value="{{ recipe.cooking_time|default:'' }}"
+    required
+  /><br />
+
+  <input
+    type="number"
+    name="servings"
+    placeholder="Количество порций"
+    value="{{ recipe.servings|default:'' }}"
+    required
+  /><br />
+
+  <input
+    type="text"
+    name="kitchen"
+    placeholder="Кухня"
+    value="{{ recipe.kitchen|default:'' }}"
+    required
+  /><br />
+
+  <label>Сложность:</label>
+  <select name="difficulty" required>
+    <option value="easy" {% if recipe.difficulty == "easy" %}selected{% endif %}>Лёгкий</option>
+    <option value="medium" {% if recipe.difficulty == "medium" %}selected{% endif %}>Средний</option>
+    <option value="hard" {% if recipe.difficulty == "hard" %}selected{% endif %}>Трудный</option>
+  </select>
+
+  <br /><br />
+  <button type="submit">Сохранить</button>
+</form>
+
+<a href="{% url 'recipe_list' %}">Назад</a>

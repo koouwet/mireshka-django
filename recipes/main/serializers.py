@@ -20,7 +20,7 @@ class IngridientsSerializer(serializers.ModelSerializer):
     def validate_quantity(self, value):
         if value <= 0:
             raise serializers.ValidationError(
-                "Количество должно быть положительным числом."
+                "Количество должно быть больше нуля"
             )
         return value
 
@@ -34,7 +34,7 @@ class InstructionSerializer(serializers.ModelSerializer):
     def validate_count_of_steps(self, value):
         if value < 0:
             raise serializers.ValidationError(
-                "Количество шагов не может быть отрицательным."
+                "Количество шагов не может быть меньше нуля"
             )
         return value
 
@@ -69,21 +69,21 @@ class RecipeSerializer(serializers.ModelSerializer):
     def validate_cooking_time(self, value):
         if value <= 0:
             raise serializers.ValidationError(
-                "Время приготовления должно быть положительным числом."
+                "Время приготовления должно быть положительным числом"
             )
         return value
 
     def validate_servings(self, value):
         if value <= 0:
             raise serializers.ValidationError(
-                "Количество порций должно быть положительным числом."
+                "Количество порций должно быть положительным числом"
             )
         return value
 
     def validate_difficulty(self, value):
         if value not in ("easy", "medium", "hard"):
             raise serializers.ValidationError(
-                "Сложность должна быть: easy, medium или hard."
+                "Сложность должна быть: easy, medium или hard"
             )
         return value
 

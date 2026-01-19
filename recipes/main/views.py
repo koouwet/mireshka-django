@@ -11,6 +11,8 @@ from django.db.models import Q
 
 
 
+
+
 class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
@@ -38,22 +40,54 @@ class RecipeViewSet(ModelViewSet):
         })
 
     @action(methods=["POST"], detail=True)
-    def add_to_favourites(self, request, pk=None):
-
+    def scale(self, request, pk=None):
         recipe = self.get_object()
-        user = request.user
 
-        favourite, created = Favourite.objects.get_or_create(
-            user=user,
-            defaults={"name": f"Избранное {user.username}"}
+    # используем существующий RecipeSerializer для валидации
+        serializer = self.get_serializer(
+            recipe,
+            data=request.data,
+            partial=True
         )
+        serializer.is_valid(raise_exception=True)
 
-        favourite.recipes.add(recipe)
+        new_servings = serializer.validated_data.get("servings")
+        old_servings = recipe.servings
+
+        if not new_servings:
+            return Response(
+                {"detail": "Нужно указать количество порций"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        factor = new_servings / old_servings
+
+    # пересчитываем ингредиенты
+        for ingredient in recipe.Ingridients.all():
+            ingredient.quantity = ingredient.quantity * factor
+            ingredient.save()
+
+        recipe.servings = new_servings
+        recipe.save()
+
+    # сериализуем обновлённые ингредиенты
+        ingridients_data = IngridientsSerializer(
+            recipe.Ingridients.all(),
+            many=True
+        ).data
 
         return Response(
-            {"detail": "Рецепт добавлен в избранное"},
+            {
+                "detail": "Рецепт масштабирован",
+                "info": "Ингредиенты обновились",
+                "old_servings": old_servings,
+                "new_servings": new_servings,
+                "ingridients": ingridients_data,
+            },
             status=status.HTTP_200_OK
         )
+
+                                       
     
     @action(methods=["GET"], detail=False)
     def q_first(self, request):
@@ -79,6 +113,11 @@ class RecipeViewSet(ModelViewSet):
 
         serializer = self.get_serializer(recipes, many=True)
         return Response(serializer.data)
+    
+    
+
+
+
     
 
 class IngridientsViewSet(ModelViewSet):

@@ -1,0 +1,50 @@
+<h1>{{ recipe.title }}</h1>
+
+<p><strong>Описание:</strong> {{ recipe.description }}</p>
+<p><strong>Кухня:</strong> {{ recipe.kitchen }}</p>
+<p><strong>Сложность:</strong> {{ recipe.get_difficulty_display }}</p>
+<p><strong>Время приготовления:</strong> {{ recipe.cooking_time }} мин</p>
+<p><strong>Порции:</strong> {{ recipe.servings }}</p>
+
+<hr />
+
+<h2>Ингредиенты</h2>
+<ul>
+  {% for ing in recipe.Ingridients.all %}
+  <li>{{ ing.name }} — {{ ing.quantity }} {{ ing.unit }}</li>
+  {% empty %}
+  <li>Ингредиенты не указаны</li>
+  {% endfor %}
+</ul>
+
+<hr />
+
+<h2>Инструкция</h2>
+{% if recipe.Instruction %}
+<p>{{ recipe.Instruction.description }}</p>
+{% else %}
+<p>Инструкция отсутствует</p>
+{% endif %}
+
+<hr />
+
+<h2>Теги</h2>
+<ul>
+  {% for tag in recipe.Tags.all %}
+  <li>{{ tag.name }}</li>
+  {% empty %}
+  <li>Теги не указаны</li>
+  {% endfor %}
+</ul>
+
+<hr />
+
+{% if user == recipe.author %}
+<a href="{% url 'recipe_update' recipe.id %}">Редактировать</a>
+<form method="post" action="{% url 'recipe_delete' recipe.id %}">
+  {% csrf_token %}
+  <button>Удалить</button>
+</form>
+{% endif %}
+
+<a href="{% url 'recipe_list' %}">Назад</a>

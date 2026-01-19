@@ -4,18 +4,26 @@ from simple_history.models import HistoricalRecords
 
 
 class Recipe(models.Model):
-    title = models.CharField("Название рецепта", max_length=255) 
-    description = models.TextField("Описание")  
-    cooking_time = models.PositiveIntegerField("Время приготовления") 
-    servings = models.PositiveIntegerField("Количество порций") 
+    title = models.CharField("Название рецепта", max_length=255)
+    description = models.TextField("Описание")
+    cooking_time = models.PositiveIntegerField("Время приготовления")
+    servings = models.PositiveIntegerField("Количество порций")
     difficulty = models.CharField(
         "Сложность",
         max_length=10,
         choices=[('easy', 'Легкий'), ('medium', 'Средний'), ('hard', 'Трудный')],
         default='easy'
-    ) 
-    kitchen = models.CharField("Кухня", max_length=100)  
-    created_at = models.DateTimeField("Создан", auto_now_add=True) 
+    )
+    kitchen = models.CharField("Кухня", max_length=100)
+    created_at = models.DateTimeField("Создан", auto_now_add=True)
+
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="recipes",
+        verbose_name="Автор"
+    )
+
     history = HistoricalRecords()
 
     def __str__(self):

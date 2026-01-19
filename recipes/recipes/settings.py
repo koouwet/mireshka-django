@@ -72,6 +72,10 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 12,
 }
 
+LOGIN_REDIRECT_URL = "/recipes/"
+LOGOUT_REDIRECT_URL = "/login/"
+
+
 
 ROOT_URLCONF = 'recipes.urls'
 
