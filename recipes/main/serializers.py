@@ -65,7 +65,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         )
         read_only_fields = ("created_at",)
 
-    # -------- ВАЛИДАЦИЯ --------
+    # -------- валидация --------
     def validate_cooking_time(self, value):
         if value <= 0:
             raise serializers.ValidationError(

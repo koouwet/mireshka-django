@@ -8,7 +8,7 @@ from .views import (
 )
 
 router = DefaultRouter()
-router.register("recipes", RecipeViewSet)
+router.register("recipes", RecipeViewSet, basename='recipes')
 router.register("ingridients", IngridientsViewSet)
 router.register("instruction", InstructionViewSet)
 router.register("tags", TagsViewSet)

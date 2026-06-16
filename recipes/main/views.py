@@ -14,7 +14,7 @@ from django.db.models import Q
 
 
 class RecipeViewSet(ModelViewSet):
-    queryset = Recipe.objects.all()
+    queryset = Recipe.objects.select_related("author")
     serializer_class = RecipeSerializer
 
     filter_backends = [
@@ -121,14 +121,14 @@ class RecipeViewSet(ModelViewSet):
     
 
 class IngridientsViewSet(ModelViewSet):
-    queryset = Ingridients.objects.all()
+    queryset = Ingridients.objects.select_related("recipe")
     serializer_class = IngridientsSerializer
 
     filter_backends = [SearchFilter]
     search_fields = ["name"]
 
 class InstructionViewSet(ModelViewSet):
-    queryset = Instruction.objects.all()
+    queryset = Instruction.objects.select_related("recipe")
     serializer_class = InstructionSerializer
 
     filter_backends = [SearchFilter]
@@ -142,6 +142,6 @@ class TagsViewSet(ModelViewSet):
     search_fields = ["name"]
 
 class FavouriteViewSet(ModelViewSet):
-    queryset = Favourite.objects.all()
+    queryset = Favourite.objects.select_related("user")
     serializer_class = FavouriteSerializer
 
