@@ -22,6 +22,10 @@ class RecipeTests(APITestCase):
 
     def test_recipe_create_success(self):
 
+        """
+        Проверяет успешное создание рецепта.
+        """
+
         data = {
             "title": "Блины",
             "description": "Очень вкусные",
@@ -52,6 +56,9 @@ class RecipeTests(APITestCase):
 
 
     def test_recipe_negative_cooking_time(self):
+        """
+        Проверяет запрет отрицательного времени приготовления.
+        """
 
         data = {
             "title": "Плохой рецепт",
@@ -79,6 +86,9 @@ class RecipeTests(APITestCase):
         )
 
     def test_recipe_negative_servings(self):
+        """
+        Проверяет запрет отрицательного количества порций.
+        """
 
         data = {
             "title": "Плохой рецепт",
@@ -106,6 +116,9 @@ class RecipeTests(APITestCase):
         )
 
     def test_filter_by_difficulty(self):
+        """
+        Проверяет фильтрацию рецептов по сложности.
+        """
 
         Recipe.objects.create(
             title="Яичница",
@@ -147,6 +160,9 @@ class RecipeTests(APITestCase):
         )
 
     def test_filter_by_kitchen(self):
+        """
+        Проверяет фильтрацию рецептов по кухне.
+        """
 
         Recipe.objects.create(
             title="Борщ",
@@ -189,6 +205,9 @@ class RecipeTests(APITestCase):
 
 
     def test_search_recipe(self):
+        """
+        Проверяет поиск рецептов.
+        """
 
         Recipe.objects.create(
             title="Гороховый суп",
@@ -230,6 +249,9 @@ class RecipeTests(APITestCase):
         )
 
     def test_ordering_by_cooking_time(self):
+        """
+        Проверяет сортировку рецептов по времени приготовления.
+        """
 
         Recipe.objects.create(
             title="Долгий",
@@ -267,6 +289,9 @@ class RecipeTests(APITestCase):
 
 
     def test_by_difficulty_action(self):
+        """
+        Проверяет работу action для группировки по сложности.
+        """
 
         Recipe.objects.create(
             title="Яичница",
@@ -303,6 +328,9 @@ class RecipeTests(APITestCase):
 
 
     def test_scale_recipe(self):
+        """
+        Проверяет масштабирование ингредиентов рецепта.
+        """
 
         recipe = Recipe.objects.create(
             title="Яичница",
@@ -343,6 +371,9 @@ class RecipeTests(APITestCase):
 
 
     def test_is_favourite_context(self):
+        """
+        Проверяет передачу данных через context.
+        """
 
         recipe = Recipe.objects.create(
             title="Борщ",
@@ -372,4 +403,3 @@ class RecipeTests(APITestCase):
         self.assertTrue(
             response.data["results"][0]["is_favourite"]
         )    
-        

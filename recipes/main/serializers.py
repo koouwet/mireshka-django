@@ -69,11 +69,17 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     
     def get_is_favourite(self, obj: Recipe) -> bool:
+        """
+        Проверяет, находится ли рецепт в избранном пользователя.
+        """
         favourites = self.context.get("favourites", [])
         return obj.id in favourites
 
    
     def validate_cooking_time(self, value: int) -> int:
+        """
+        Проверяет корректность времени приготовления.
+        """
         if value <= 0:
             raise serializers.ValidationError(
                 "Время приготовления должно быть положительным числом"
@@ -81,6 +87,9 @@ class RecipeSerializer(serializers.ModelSerializer):
         return value
 
     def validate_servings(self, value: int) -> int:
+        """
+        Проверяет корректность количества порций.
+        """
         if value <= 0:
             raise serializers.ValidationError(
                 "Количество порций должно быть положительным числом"
@@ -88,6 +97,9 @@ class RecipeSerializer(serializers.ModelSerializer):
         return value
 
     def validate_difficulty(self, value: str) -> str:
+        """
+        Проверяет допустимое значение сложности рецепта.
+        """
         if value not in ("easy", "medium", "hard"):
             raise serializers.ValidationError(
                 "Сложность должна быть: easy, medium или hard"

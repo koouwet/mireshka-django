@@ -33,6 +33,9 @@ class RecipeViewSet(ModelViewSet):
 
     @action(methods=["GET"], detail=False)
     def by_difficulty(self, request) -> Response:
+        """
+        Возвращает рецепты, сгруппированные по уровню сложности.
+        """
 
         easy = Recipe.objects.filter(difficulty="easy")
         medium = Recipe.objects.filter(difficulty="medium")
@@ -45,10 +48,16 @@ class RecipeViewSet(ModelViewSet):
         })
     
     def perform_create(self, serializer) -> None:
+        """
+        Сохраняет автора рецепта как текущего пользователя.
+        """
         serializer.save(author=self.request.user)
 
     @action(methods=["POST"], detail=True)
     def scale(self, request, pk=None) -> Response:
+        """
+        Масштабирует количество ингредиентов под новое число порций.
+        """
         recipe = self.get_object()
 
     
@@ -99,6 +108,9 @@ class RecipeViewSet(ModelViewSet):
     
     @action(methods=["GET"], detail=False)
     def q_first(self, request) -> Response:
+        """
+        Выполняет сложную фильтрацию рецептов с использованием Q-объектов.
+        """
 
         recipes = Recipe.objects.filter(
             (Q(difficulty="easy") & Q(cooking_time__lte=30))
@@ -112,6 +124,9 @@ class RecipeViewSet(ModelViewSet):
 
     @action(methods=["GET"], detail=False)
     def q_second(self, request) -> Response:
+        """
+        Выполняет альтернативную сложную фильтрацию рецептов с использованием Q-объектов.
+        """
 
         recipes = Recipe.objects.filter(
             (Q(difficulty="hard") & Q(servings__gte=4))
@@ -123,6 +138,9 @@ class RecipeViewSet(ModelViewSet):
         return Response(serializer.data)
     
     def get_serializer_context(self) -> dict:
+        """
+        Передаёт в сериализатор список избранных рецептов пользователя.
+        """
         context = super().get_serializer_context()
 
         favourites = []
