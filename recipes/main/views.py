@@ -7,14 +7,19 @@ from rest_framework import viewsets, status
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter
-from django.db.models import Q
+from django.db.models import Q, Count
 
 
 
 
 
 class RecipeViewSet(ModelViewSet):
-    queryset = Recipe.objects.select_related("author")
+    queryset = Recipe.objects.select_related(
+        "author"
+    ).annotate(
+        ingredients_count=Count("Ingridients")
+    )
+
     serializer_class = RecipeSerializer
 
     filter_backends = [
@@ -27,7 +32,7 @@ class RecipeViewSet(ModelViewSet):
     search_fields = ["title", "description",]
 
     @action(methods=["GET"], detail=False)
-    def by_difficulty(self, request):
+    def by_difficulty(self, request) -> Response:
 
         easy = Recipe.objects.filter(difficulty="easy")
         medium = Recipe.objects.filter(difficulty="medium")
@@ -38,12 +43,15 @@ class RecipeViewSet(ModelViewSet):
             "medium": RecipeSerializer(medium, many=True).data,
             "hard": RecipeSerializer(hard, many=True).data,
         })
+    
+    def perform_create(self, serializer) -> None:
+        serializer.save(author=self.request.user)
 
     @action(methods=["POST"], detail=True)
-    def scale(self, request, pk=None):
+    def scale(self, request, pk=None) -> Response:
         recipe = self.get_object()
 
-    # используем существующий RecipeSerializer для валидации
+    
         serializer = self.get_serializer(
             recipe,
             data=request.data,
@@ -62,7 +70,7 @@ class RecipeViewSet(ModelViewSet):
 
         factor = new_servings / old_servings
 
-    # пересчитываем ингредиенты
+    
         for ingredient in recipe.Ingridients.all():
             ingredient.quantity = ingredient.quantity * factor
             ingredient.save()
@@ -70,7 +78,7 @@ class RecipeViewSet(ModelViewSet):
         recipe.servings = new_servings
         recipe.save()
 
-    # сериализуем обновлённые ингредиенты
+    
         ingridients_data = IngridientsSerializer(
             recipe.Ingridients.all(),
             many=True
@@ -90,7 +98,7 @@ class RecipeViewSet(ModelViewSet):
                                        
     
     @action(methods=["GET"], detail=False)
-    def q_first(self, request):
+    def q_first(self, request) -> Response:
 
         recipes = Recipe.objects.filter(
             (Q(difficulty="easy") & Q(cooking_time__lte=30))
@@ -103,7 +111,7 @@ class RecipeViewSet(ModelViewSet):
 
 
     @action(methods=["GET"], detail=False)
-    def q_second(self, request):
+    def q_second(self, request) -> Response:
 
         recipes = Recipe.objects.filter(
             (Q(difficulty="hard") & Q(servings__gte=4))
@@ -113,6 +121,26 @@ class RecipeViewSet(ModelViewSet):
 
         serializer = self.get_serializer(recipes, many=True)
         return Response(serializer.data)
+    
+    def get_serializer_context(self) -> dict:
+        context = super().get_serializer_context()
+
+        favourites = []
+
+        if self.request.user.is_authenticated:
+            favourite = Favourite.objects.filter(
+                user=self.request.user
+            ).first()
+
+            if favourite:
+                favourites = favourite.recipes.values_list(
+                    "id",
+                    flat=True
+                )
+
+        context["favourites"] = favourites
+
+        return context
     
     
 
